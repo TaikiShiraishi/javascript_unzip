@@ -1,0 +1,79 @@
+{
+  "name": "javscritp unzip",
+  "private": true,
+  "version": "1.0.0",
+  "description": "javscritp unzip",
+  "engines": {
+    "node": "^8.2.0",
+    "npm": "^5.3.0"
+  },
+  "config": {
+    "build": "public",
+    "markup": "src/markup",
+    "development": "development",
+    "production": "production"
+  },
+  "scripts": {
+    "start": "npm-run-all clean dev",
+    "release": "npm-run-all clean production",
+    "mkdir": "node ./helpers/mkdir.js",
+    "dev": "cross-env NODE_ENV=$npm_package_config_development npm-run-all --parallel dev:* server",
+    "dev:template": "npm-run-all pug watch-pug",
+    "dev:script": "webpack --config webpack.config.js -d --progress --watch --display-error-details",
+    "production": "cross-env NODE_ENV=$npm_package_config_production npm-run-all production:*",
+    "production:template": "npm-run-all pug",
+    "production:script": "webpack --config webpack.config.js -p --progress",
+    "pug": "pug $npm_package_config_markup/*.pug --out $npm_package_config_build --pretty",
+    "watch-pug": "nodemon -e pug -x \"npm run pug\"",
+    "server": "browser-sync start --server $npm_package_config_build --files $npm_package_config_build --port 8000 --open external --reload-delay 200 --no-ghost-mode false",
+    "clean": "rimraf $npm_package_config_build",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TaikiShiraishi/frontend-webapp-boilerplate.git"
+  },
+  "author": "",
+  "bugs": {
+    "url": "https://github.com/TaikiShiraishi/frontend-webapp-boilerplate/issues"
+  },
+  "homepage": "https://github.com/TaikiShiraishi/frontend-webapp-boilerplate#readme",
+  "devDependencies": {
+    "autoprefixer": "^7.1.2",
+    "babel-core": "^6.25.0",
+    "babel-eslint": "^7.2.3",
+    "babel-loader": "^7.1.1",
+    "babel-plugin-transform-class-properties": "^6.24.1",
+    "babel-plugin-transform-runtime": "^6.23.0",
+    "babel-preset-es2015": "^6.24.1",
+    "babel-preset-es2016": "^6.24.1",
+    "babel-preset-es2017": "^6.24.1",
+    "browser-sync": "^2.18.13",
+    "cpx": "^1.5.0",
+    "cross-env": "^5.0.5",
+    "css-mqpacker": "^6.0.1",
+    "eslint": "^4.4.1",
+    "eslint-config-airbnb": "^15.1.0",
+    "eslint-loader": "^1.9.0",
+    "eslint-plugin-import": "^2.7.0",
+    "fs-extra": "^4.0.1",
+    "json-loader": "^0.5.7",
+    "lodash": "^4.17.4",
+    "node-sass": "^4.5.3",
+    "nodemon": "^1.11.0",
+    "npm-run-all": "^4.0.2",
+    "path": "^0.12.7",
+    "postcss-cli": "^4.1.0",
+    "pug-cli": "^1.0.0-alpha6",
+    "rimraf": "^2.6.1",
+    "strip-loader": "^0.1.2",
+    "svg-sprite": "^1.3.7",
+    "touch": "^3.1.0",
+    "uglify-save-license": "^0.4.1",
+    "uglifyjs-webpack-plugin": "^0.4.6",
+    "webpack": "^3.5.4"
+  },
+  "dependencies": {
+    "jszip": "^3.1.4"
+  }
+}
