@@ -8,6 +8,7 @@ function init() {
       this._input = moduleRoot.querySelector('.js-imageInput');
       this._threshold = threshold;
       this._resetState();
+      this._output = document.getElementById('output');
     }
 
     _resetState() {
@@ -44,21 +45,6 @@ function init() {
       const file = evt.target.files[0];
       this._file = file;
 
-      const zip = new JSZip();
-
-      zip.loadAsync(file)
-        .then((zipfile) => {
-          const jpegFiles = zipfile.filter((zipEntry) => {
-            const imageFiles = zipEntry.match(/jpg|png/);
-            return imageFiles ? imageFiles.input.indexOf('__MACOSX') >= 0 : false;
-          });
-          console.log(jpegFiles);
-          // zipfile.forEach((relativePath, zipEntry) => {
-          //   console.log(zipEntry.name);
-          // });
-        }, (error) => {
-          console.log(`Error reading ${file.name}: ${error.message}`);
-        });
 
       if (!file) {
         this._fileCanceled();
@@ -68,6 +54,8 @@ function init() {
       if (!this._validateFileType()) {
         return;
       }
+
+      this._zipToImage(file);
 
       this._reader = new FileReader();
       const reader = this._reader;
@@ -79,6 +67,33 @@ function init() {
       };
       reader.onerror = this._previewImageOnError;
       reader.readAsDataURL(file);
+    }
+
+    _zipToImage(file) {
+      const zip = new JSZip();
+
+      zip.loadAsync(file)
+        .then((zipfile) => {
+          const fileNames = Object.keys(zipfile.files);
+          const filterFileNames = fileNames.filter(fileName => fileName.match(/^(?!__MACOSX).*$/));
+          const imagesNames = filterFileNames.filter(filterFileName => filterFileName.match(/^.*.png$|^.*.jpg$/));
+          const newfiles = imagesNames.map(x => zipfile.files[x]);
+          newfiles.forEach((newfile) => {
+            newfile.async('blob').then((blob) => {
+
+              const reader = new FileReader();
+              reader.readAsDataURL(blob);
+              reader.onloadend = () => {
+                const base64data = reader.result;
+                const img = document.createElement('img');
+                img.src = base64data;
+                this._output.appendChild(img);
+              };
+            });
+          });
+        }, (error) => {
+          console.log(`Error reading ${file.name}: ${error.message}`);
+        });
     }
 
     _attachHandlers() {
