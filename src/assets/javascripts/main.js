@@ -1,3 +1,4 @@
+/* eslint no-param-reassign: ["error", { "props": false }] */
 import JSZip from 'jszip';
 
 function init() {
@@ -9,6 +10,7 @@ function init() {
       this._threshold = threshold;
       this._resetState();
       this._output = document.getElementById('output');
+      this._dropArea = document.getElementById('js-dropArea');
     }
 
     _resetState() {
@@ -69,6 +71,20 @@ function init() {
       reader.readAsDataURL(file);
     }
 
+    _onDragOver(evt) {
+      evt.stopPropagation();
+      evt.preventDefault();
+      evt.dataTransfer.dropEffect = 'copy';
+      this._dropArea.style.cssText += 'background-color: tomato';
+    }
+
+    _onDrop(evt) {
+      evt.stopPropagation();
+      evt.preventDefault();
+      const file = evt.dataTransfer.files[0];
+      this._zipToImage(file);
+    }
+
     _zipToImage(file) {
       const zip = new JSZip();
 
@@ -80,7 +96,6 @@ function init() {
           const newfiles = imagesNames.map(x => zipfile.files[x]);
           newfiles.forEach((newfile) => {
             newfile.async('blob').then((blob) => {
-
               const reader = new FileReader();
               reader.readAsDataURL(blob);
               reader.onloadend = () => {
@@ -98,12 +113,16 @@ function init() {
 
     _attachHandlers() {
       this._input.addEventListener('change', this._onChangeInput, false);
+      this._dropArea.addEventListener('dragover', this._onDragOver, false);
+      this._dropArea.addEventListener('drop', this._onDrop, false);
     }
 
     _setBoundHandlers() {
       this._onChangeInput = this._onChangeInput.bind(this);
       this._previewImageOnLoadStart = this._previewImageOnLoadStart.bind(this);
       this._previewImageOnError = this._previewImageOnError.bind(this);
+      this._onDragOver = this._onDragOver.bind(this);
+      this._onDrop = this._onDrop.bind(this);
     }
 
     init() {
