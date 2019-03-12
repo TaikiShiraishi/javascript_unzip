@@ -25,7 +25,8 @@ function init() {
 
     _validateFileType() {
       const type = this._file.type;
-      if (type === 'application/zip') {
+      const regex = new RegExp(/^application\/zip$|^image\/(png|jpg|jpeg)$/);
+      if (regex.test(type)) {
         return true;
       }
       this._input.value = '';
@@ -81,8 +82,17 @@ function init() {
     _onDrop(evt) {
       evt.stopPropagation();
       evt.preventDefault();
-      const file = evt.dataTransfer.files[0];
-      this._zipToImage(file);
+      this._file = evt.dataTransfer.files[0];
+
+      if (!this._file) {
+        this._fileCanceled();
+        return;
+      }
+
+      if (!this._validateFileType()) {
+        return;
+      }
+      this._zipToImage(this._file);
     }
 
     _zipToImage(file) {
